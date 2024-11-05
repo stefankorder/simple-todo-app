@@ -5,21 +5,33 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  TextField,
 } from "@mui/material";
 import { ReactNode } from "react";
 
 const ToDoItem = ({
   id,
   children,
+  timestamp,
+  checked,
+  editModeEnabled,
   onDelete,
+  onToggle,
+  onEditMode,
+  onEditTodo,
 }: {
   id: string;
   children: ReactNode;
+  timestamp: string;
+  checked: boolean;
+  editModeEnabled: boolean;
   onDelete: (idToDelete: string) => void;
+  onToggle: (idToToggle: string) => void;
+  onEditMode: (idToHandleEditMode: string) => void;
+  onEditTodo: (idToEdit: string, newText: string) => void;
 }) => {
   return (
     <ListItem
-      sx={{ border: "1px solid black" }}
       secondaryAction={
         <IconButton
           onClick={() => onDelete(id)}
@@ -32,19 +44,32 @@ const ToDoItem = ({
     >
       <Checkbox
         edge="start"
-        //checked={false}
+        checked={checked}
         tabIndex={-1}
         disableRipple
         inputProps={{ "aria-labelledby": id }}
+        onChange={() => onToggle(id)}
       />
-      <ListItemButton
-        sx={{ pl: 0.5, pr: 0.5 }}
-        disableGutters
-        onClick={() => {}}
-        dense
-      >
-        <ListItemText id={id} primary={children} />
-      </ListItemButton>
+      {editModeEnabled ? (
+        <TextField
+          size="small"
+          variant="standard"
+          autoFocus
+          fullWidth
+          value={children}
+          onBlur={() => onEditMode(id)}
+          onChange={(event) => onEditTodo(id, String(event.target.value))}
+        />
+      ) : (
+        <ListItemButton
+          sx={{ pl: 0.5, pr: 0.5 }}
+          disableGutters
+          onClick={() => onEditMode(id)}
+          dense
+        >
+          <ListItemText id={id} primary={children} secondary={timestamp} />
+        </ListItemButton>
+      )}
     </ListItem>
   );
 };
